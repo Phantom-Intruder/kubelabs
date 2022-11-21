@@ -12,6 +12,14 @@ First, a folder must be created to house all the files pertaining to the Helm ch
  ┗ 📜values.yaml
 ```
 
+You don't have to manually make this folder structure. Instead, you could simply use:
+
+```
+helm create Wordpress
+```
+
+This will give you a lot more than just the above set of files, but you can delete whatever you don't need.
+
 First, let's consider the [Chart.yaml](./Wordpress/Chart.yaml). This is where chart information is defined. The ```Chart.yaml``` provided here is taken from the Helm docs and describes the file in great detail. 
 
 Next, let us consider the templates folder. Inside this folder, you may define as many Helm templates as you wish. In this case, I have added a template called [configmap.yaml](./Wordpress/templates/configmap.yaml). As you can see, the template uses a placeholder notation ```{{}}``` in order specify that these values can be dynamically changed later on, and this is where the ```values.yaml``` comes in.
