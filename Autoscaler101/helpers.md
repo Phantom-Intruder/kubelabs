@@ -9,6 +9,7 @@ We have now discussed HPA's, VPA's, and you might have even read the section on 
 - Pod requests/limits
 - Rollover strategy
 - Pod topology skews
+- Post/Pre-sync hooks
 
 You may have already come across these concepts before, and just about every Kubernetes-based tool uses them to ensure stability. We will discuss each of the above points and follow up with a lab where we test out the above concepts using a simple Nginx server.
 
@@ -667,6 +668,10 @@ topologySpreadConstraints:
 ```
 
 This will skew the deployments based on the zone, but if no machines are available to schedule in a skewed manner, the skew will be ignored. However, if you have several applications that can share resources in multiple machines, you can force the pods to be scheduled in separate zones by replacing `ScheduleAnyway` with `DoNotSchedule`. If no machines are available in separate zones, the pod will refuse to schedule. Once that happens, your node scaler will kick in to satisfy the requirement.
+
+## Hooks
+
+
 
 # Conclusion
 
