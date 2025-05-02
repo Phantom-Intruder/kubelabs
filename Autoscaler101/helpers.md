@@ -671,7 +671,20 @@ This will skew the deployments based on the zone, but if no machines are availab
 
 ## Hooks
 
+We have seen hooks being used in the previous section where we set preStop hooks to enable graceful shutdown in nginx. preStop hooks can be used to do all sorts of things, and now we will consider a situation where scaling can cause 502s and how preStop hooks can be used to prevent them.
 
+If you have applications within a cluster that talk to each other, you will likely be using the internal DNS to facilitate this communication. However, if you need to contact your application from outside (which is usually the case), you would need to have a load balancer that attaches to your pods. Since pods are dynamic and the pod IPs change regularly, there would be a load balancer controller running in your cluster that identifies and adjusts the pod IPs in the load balancer target groups to reflect the changes. However, they don't adjust with millisecond precision. When a pod gets removed there may be a few seconds before the load balancer gets updated and removes the target. During this time, you get a few seconds of 502s. This might not sound like a big deal,. Still, if your application is regularly scaling up and down and you have a lot of requests coming in all the time, this could lead to a degraded customer experience. This is where hooks come in to prevent this 502 from happening.
+
+Consider this preStop hook:
+
+```yaml
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 60"] 
+```
+
+This will prevent the application from getting deleted for 60 seconds after the termination signal has been sent by Kubernetes even if the shutdown processes have finished.
 
 # Conclusion
 
