@@ -681,10 +681,11 @@ Consider this preStop hook:
 lifecycle:
   preStop:
     exec:
-      command: ["/bin/sh", "-c", "sleep 60"] 
+      command: ["/bin/sh", "-c", "sleep 60"]
+terminationGracePeriodSeconds: 90
 ```
 
-This will prevent the application from getting deleted for 60 seconds after the termination signal has been sent by Kubernetes even if the shutdown processes have finished.
+This will prevent the application running for 60 seconds after the termination signal has been sent by Kubernetes. This ensures that the load balancer has time to notice that the pod is shutting down and curb traffic to it. You also need to set `terminationGracePeriodSeconds` properly (at a higher value that the sleep period).
 
 # Conclusion
 
