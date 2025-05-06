@@ -685,7 +685,13 @@ lifecycle:
 terminationGracePeriodSeconds: 90
 ```
 
-This will prevent the application running for 60 seconds after the termination signal has been sent by Kubernetes. This ensures that the load balancer has time to notice that the pod is shutting down and curb traffic to it. You also need to set `terminationGracePeriodSeconds` properly (at a higher value that the sleep period).
+This will prevent the application from running for 60 seconds after the termination signal has been sent by Kubernetes. This ensures that the load balancer has time to notice that the pod is shutting down and curbs traffic. You also need to set `terminationGracePeriodSeconds` properly (at a higher value than the sleep period). If you are using a service mesh or any other tool that acts as a proxy in front of your main container, make sure that this container also honors the grace period. For example, if you use [Linkerd](../ServiceMesh101/what-is-linkerd.md), you have to use the annotation:
+
+```yaml
+config.alpha.linkerd.io/proxy-wait-before-exit-seconds: '60'
+```
+
+This will make the proxy wait 60 seconds along with the container before it goes into a shutdown. If this is not present, the proxy will shut down immediately while the main container is still receiving requests. The requests that come in won't be going out, thereby giving a connection refused error.
 
 # Conclusion
 
