@@ -693,7 +693,16 @@ config.alpha.linkerd.io/proxy-wait-before-exit-seconds: '60'
 
 This will make the proxy wait 60 seconds along with the container before it goes into a shutdown. If this is not present, the proxy will shut down immediately while the main container is still receiving requests. The requests that come in won't be going out, thereby giving a connection refused error.
 
-The next type of hook is the `postStart` hook. This hook runs immediately after your container is started. You can see this happen above for the nginx container where we echo "'nginx started'" right after the nginx container is ready. What's important here is that when the post start hook activates, the container is ready but not marked as running, so your post start action is the very first thing that happens. So if you have warm up tasks, file/directory initializations, or even security and compliance setups then this is the place to do it. Note however that the `postStart` hook doesn't block the application startup. The main container process runs concurrently with the PostStart command and hooks are not guaranteed to complete before readiness/liveness probes begin, so time-sensitive tasks should be lightweight.
+The next type of hook is the `postStart` hook. This hook runs immediately after your container is started. You can see this happen above for the nginx container where we echo "'nginx started'" right after the nginx container is ready. 
+
+```yaml
+lifecycle:
+  postStart:
+    exec:
+      command: ["/bin/sh", "-c", "echo 'nginx started'"]
+```
+
+What's important here is that when the post start hook activates, the container is ready but not marked as running, so your post start action is the very first thing that happens. So if you have warm up tasks, file/directory initializations, or even security and compliance setups then this is the place to do it. Note however that the `postStart` hook doesn't block the application startup. The main container process runs concurrently with the PostStart command and hooks are not guaranteed to complete before readiness/liveness probes begin, so time-sensitive tasks should be lightweight. If the PostStart hook fails (returns non-zero), Kubernetes terminates the container, even if the main app is running fine. So while it doesn’t block startup, it can cause the container to restart if it fails.
 
 # Conclusion
 
