@@ -9,6 +9,7 @@ We have now discussed HPA's, VPA's, and you might have even read the section on 
 - Pod requests/limits
 - Rollover strategy
 - Pod topology skews
+- Post/Pre-sync hooks
 
 You may have already come across these concepts before, and just about every Kubernetes-based tool uses them to ensure stability. We will discuss each of the above points and follow up with a lab where we test out the above concepts using a simple Nginx server.
 
@@ -667,6 +668,41 @@ topologySpreadConstraints:
 ```
 
 This will skew the deployments based on the zone, but if no machines are available to schedule in a skewed manner, the skew will be ignored. However, if you have several applications that can share resources in multiple machines, you can force the pods to be scheduled in separate zones by replacing `ScheduleAnyway` with `DoNotSchedule`. If no machines are available in separate zones, the pod will refuse to schedule. Once that happens, your node scaler will kick in to satisfy the requirement.
+
+## Hooks
+
+We have seen hooks being used in the previous section where we set preStop hooks to enable graceful shutdown in nginx. preStop hooks can be used to do all sorts of things, and now we will consider a situation where scaling can cause 502s and how preStop hooks can be used to prevent them.
+
+If you have applications within a cluster that talk to each other, you will likely be using the internal DNS to facilitate this communication. However, if you need to contact your application from outside (which is usually the case), you would need to have a load balancer that attaches to your pods. Since pods are dynamic and the pod IPs change regularly, there would be a load balancer controller running in your cluster that identifies and adjusts the pod IPs in the load balancer target groups to reflect the changes. However, they don't adjust with millisecond precision. When a pod gets removed there may be a few seconds before the load balancer gets updated and removes the target. During this time, you get a few seconds of 502s. This might not sound like a big deal,. Still, if your application is regularly scaling up and down and you have a lot of requests coming in all the time, this could lead to a degraded customer experience. This is where hooks come in to prevent this 502 from happening.
+
+Consider this preStop hook:
+
+```yaml
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 60"]
+terminationGracePeriodSeconds: 90
+```
+
+This will prevent the application from running for 60 seconds after the termination signal has been sent by Kubernetes. This ensures that the load balancer has time to notice that the pod is shutting down and curbs traffic. You also need to set `terminationGracePeriodSeconds` properly (at a higher value than the sleep period). If you are using a service mesh or any other tool that acts as a proxy in front of your main container, make sure that this container also honors the grace period. For example, if you use [Linkerd](../ServiceMesh101/what-is-linkerd.md), you have to use the annotation:
+
+```yaml
+config.alpha.linkerd.io/proxy-wait-before-exit-seconds: '60'
+```
+
+This will make the proxy wait 60 seconds along with the container before it goes into a shutdown. If this is not present, the proxy will shut down immediately while the main container is still receiving requests. The requests that come in won't be going out, thereby giving a connection refused error.
+
+The next type of hook is the `postStart` hook. This hook runs immediately after your container is started. You can see this happen above for the nginx container where we echo "'nginx started'" right after the nginx container is ready. 
+
+```yaml
+lifecycle:
+  postStart:
+    exec:
+      command: ["/bin/sh", "-c", "echo 'nginx started'"]
+```
+
+What's important here is that when the post start hook activates, the container is ready but not marked as running, so your post start action is the very first thing that happens. So if you have warm up tasks, file/directory initializations, or even security and compliance setups then this is the place to do it. Note however that the `postStart` hook doesn't block the application startup. The main container process runs concurrently with the PostStart command and hooks are not guaranteed to complete before readiness/liveness probes begin, so time-sensitive tasks should be lightweight. If the PostStart hook fails (returns non-zero), Kubernetes terminates the container, even if the main app is running fine. So while it doesn’t block startup, it can cause the container to restart if it fails.
 
 # Conclusion
 
