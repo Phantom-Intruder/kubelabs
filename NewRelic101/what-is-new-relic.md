@@ -1,23 +1,6 @@
-**New Relic** is a **cloud-based observability platform** that helps developers, IT operations, and business leaders monitor and optimize the performance of their applications and infrastructure.
+# New Relic
 
-### Key Features of New Relic:
-
-1. **Application Performance Monitoring (APM)**
-
-   * Tracks performance metrics for applications (e.g., response time, throughput, error rates).
-   * Supports multiple languages like Java, Python, Node.js, .NET, Ruby, PHP, and Go.
-
-2. **Infrastructure Monitoring**
-
-   * Provides visibility into servers, containers, cloud providers (like AWS, Azure, GCP), and Kubernetes environments.
-
-3. **Real-Time Dashboards**
-
-   * Offers customizable dashboards for visualizing metrics and logs.
-
-4. **Distributed Tracing**
-
-   * Helps trace requests as they travel through various services and systems, useful for microservices architectures.
+**New Relic** is an **observability platform** that helps developers, devops, and non-technical management monitor and optimize the performance of their applications and infrastructure. It can give you application level insights by tracking performance metrics for applications (e.g., response time, throughput, error rates) and supports multiple languages like Java, Python, Node.js, .NET, Ruby, PHP, and Go. This is useful for developers and SRE teams that want to quickly get to the root cause of an issue from the applications side. It also provides visibility into servers, containers, cloud providers (like AWS, Azure, GCP), and Kubernetes environments - which is what we will be focusing on. It also provides customizable dashboards for visualizing metrics and logs and helps trace requests as they travel through various services and systems, useful for microservices architectures.
 
 5. **Logs in Context**
 
