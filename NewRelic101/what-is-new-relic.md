@@ -4,25 +4,13 @@
 
 So basically this is a single point of information regarding your entire system. It is a supercharged version of Prometheus, where you don't really have to do any setup or maintenance. However, unlike Prometheus, New Relic is a paid service that charges per each GB of data that is sent to their system. Similar to Prometheus' PromQL, New Relic has NRQL which can be used to query every aspect of your system using a query language. In this section, we will go through implementing New Relic on your Kubernetes clusters, best practices, how to keep your costs low, important NRQL queries to use, as well as the Kubernetes events and other areas that are useful when debugging issues on Kubernetes.
 
-### Use Cases:
-
-* Troubleshooting performance bottlenecks in code.
-* Monitoring cloud infrastructure health.
-* Ensuring uptime and availability of websites or APIs.
-* Correlating metrics, traces, and logs for faster root cause analysis.
-
 ### Pricing:
 
-New Relic uses a usage-based pricing model, which includes:
+Note that New Relic uses a usage-based pricing model, which includes:
 
 * Free tier with limited data retention and capabilities.
 * Paid plans based on the number of users and amount of data ingested (measured in GBs).
 
-### Competitors:
+## Installation
 
-* Datadog
-* Dynatrace
-* Splunk Observability
-* AppDynamics (Cisco)
-
-Would you like help setting up New Relic or understanding how to use it for a specific application or environment?
+Setting up the New Relic integration for Kubernetes is very simple. The best way to do this is to go to the add an entity option in the New Relic dashboard and follow the guided install instructions. Make sure to select the Helm chart option. The CLI option is easier but it is not very customizable in the same way a Helm chart can be changed using the values.yaml.
