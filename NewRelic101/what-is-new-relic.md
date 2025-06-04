@@ -13,4 +13,20 @@ Note that New Relic uses a usage-based pricing model, which includes:
 
 ## Installation
 
-Setting up the New Relic integration for Kubernetes is very simple. The best way to do this is to go to the add an entity option in the New Relic dashboard and follow the guided install instructions. Make sure to select the Helm chart option. The CLI option is easier but it is not very customizable in the same way a Helm chart can be changed using the values.yaml.
+Setting up the New Relic integration for Kubernetes is very simple. The best way to do this is to go to the add an entity option in the New Relic dashboard and follow the guided install instructions. Make sure to select the Helm chart option. The CLI option is easier but it is not very customizable in the same way a Helm chart can be changed using the values.yaml. Once you enter your license key and fill in the necessary information, a Helm command will be given to you that you can directly use in the CLI to install New Relic onto your cluster. However, it is best to take the values.yaml that are also provided alongside the command and fine-tune options manually before you install the chart. This is because the guided install only provides very basic options when it comes to installation whereas the full chart has far more options.
+
+For a full reference of the options that the chart has, check the [official chart GitHub page](https://github.com/newrelic/helm-charts/tree/master/charts/nri-bundle). We will discuss a few important options that are definitely worth looking into.
+
+### Low data mode
+
+By default, New Relic scrapes cluster metrics and other information every 15 seconds. By setting `lowDataMode: true` you can increase this scrape interval to 30 seconds which will reduce the amount of data being sent to New Relic without really affecting anything.
+
+### Disable unwanted items
+
+### Using a proxy
+
+If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we an achieve this with squid proxy in the next section.
+
+```bash
+helm repo update ; helm upgrade --install newrelic-bundle newrelic/nri-bundle -n newrelic --values values.yaml
+```
