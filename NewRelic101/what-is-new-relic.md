@@ -23,6 +23,45 @@ By default, New Relic scrapes cluster metrics and other information every 15 sec
 
 ### Disable unwanted items
 
+Depending on your business needs, its important to only enable the aspects of New Relic that you will actually be using. For example, if you don't need Prometheus OpenMetrics, you can disable it 
+
+```yaml
+nri-prometheus:
+  enabled: false
+```
+
+newrelic-logging:
+  # newrelic-logging.enabled -- Install the [`newrelic-logging` chart](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging)
+  enabled: false
+
+newrelic-pixie:
+  # newrelic-pixie.enabled -- Install the [`newrelic-pixie`](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie)
+  enabled: false
+
+pixie-chart:
+  # pixie-chart.enabled -- Install the [`pixie-chart` chart](https://docs.pixielabs.ai/installing-pixie/install-schemes/helm/#3.-deploy)
+  enabled: false
+
+newrelic-infra-operator:
+  # newrelic-infra-operator.enabled -- Install the [`newrelic-infra-operator` chart](https://github.com/newrelic/newrelic-infra-operator/tree/main/charts/newrelic-infra-operator) (Beta)
+  enabled: false
+
+newrelic-prometheus-agent:
+  # newrelic-prometheus-agent.enabled -- Install the [`newrelic-prometheus-agent` chart](https://github.com/newrelic/newrelic-prometheus-configurator/tree/main/charts/newrelic-prometheus-agent)
+  enabled: false
+
+newrelic-eapm-agent:
+  # newrelic-eapm-agent.enabled -- Install the [`nr-eapm-agent`](https://github.com/newrelic/helm-charts/tree/master/charts/nr-ebpf-agent)
+  enabled: false
+
+k8s-agents-operator:
+  # k8s-agents-operator.enabled -- Install the [`k8s-agents-operator` chart](https://github.com/newrelic/k8s-agents-operator/tree/main/charts/k8s-agents-operator)
+  enabled: false
+
+newrelic-k8s-metrics-adapter:
+  # newrelic-k8s-metrics-adapter.enabled -- Install the [`newrelic-k8s-metrics-adapter.` chart](https://github.com/newrelic/newrelic-k8s-metrics-adapter/tree/main/charts/newrelic-k8s-metrics-adapter) (Beta)
+  enabled: false
+
 ### Using a proxy
 
 If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we an achieve this with squid proxy in the next section.
