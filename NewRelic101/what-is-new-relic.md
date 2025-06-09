@@ -30,13 +30,21 @@ nri-prometheus:
   enabled: false
 ```
 
+If you don't need cluster logs:
+
+```yaml
 newrelic-logging:
   # newrelic-logging.enabled -- Install the [`newrelic-logging` chart](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging)
   enabled: false
+```
 
+Note that you will be getting Kubernetes events (and it is highly recommended that you keep events enabled). Only Kubernetes logs which aren't generally useful will be disabled. The same goes for [pixie](https://docs.px.dev/about-pixie/what-is-pixie/) which auto instruments stuff:
+
+```yaml
 newrelic-pixie:
   # newrelic-pixie.enabled -- Install the [`newrelic-pixie`](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie)
   enabled: false
+```
 
 pixie-chart:
   # pixie-chart.enabled -- Install the [`pixie-chart` chart](https://docs.pixielabs.ai/installing-pixie/install-schemes/helm/#3.-deploy)
