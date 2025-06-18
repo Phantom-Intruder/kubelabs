@@ -44,12 +44,15 @@ Note that you will be getting Kubernetes events (and it is highly recommended th
 newrelic-pixie:
   # newrelic-pixie.enabled -- Install the [`newrelic-pixie`](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie)
   enabled: false
-```
 
 pixie-chart:
   # pixie-chart.enabled -- Install the [`pixie-chart` chart](https://docs.pixielabs.ai/installing-pixie/install-schemes/helm/#3.-deploy)
   enabled: false
+```
 
+If you don't want to scrape detailed node level data and send it to New Relic, you can disable the New Relic Prometheus agent as well as the infra operators:
+
+```yaml
 newrelic-infra-operator:
   # newrelic-infra-operator.enabled -- Install the [`newrelic-infra-operator` chart](https://github.com/newrelic/newrelic-infra-operator/tree/main/charts/newrelic-infra-operator) (Beta)
   enabled: false
@@ -57,10 +60,17 @@ newrelic-infra-operator:
 newrelic-prometheus-agent:
   # newrelic-prometheus-agent.enabled -- Install the [`newrelic-prometheus-agent` chart](https://github.com/newrelic/newrelic-prometheus-configurator/tree/main/charts/newrelic-prometheus-agent)
   enabled: false
+```
 
+If you have a few application running on your cluster, you can keep the eapm and auto apm injection enabled so you don't have to manully set up the APM agent for each application. However if you have many applications and only need to instrument a few then you need to disable this. The same applies if you plan to selectively enable metrics from APM agents:
+
+```
 newrelic-eapm-agent:
   # newrelic-eapm-agent.enabled -- Install the [`nr-eapm-agent`](https://github.com/newrelic/helm-charts/tree/master/charts/nr-ebpf-agent)
   enabled: false
+```
+
+Other things that can save you money are the k8s-agents-operator and newrelic-k8s-metrics-adapter.
 
 k8s-agents-operator:
   # k8s-agents-operator.enabled -- Install the [`k8s-agents-operator` chart](https://github.com/newrelic/k8s-agents-operator/tree/main/charts/k8s-agents-operator)
