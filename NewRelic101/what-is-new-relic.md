@@ -64,14 +64,19 @@ newrelic-prometheus-agent:
 
 If you have a few application running on your cluster, you can keep the eapm and auto apm injection enabled so you don't have to manully set up the APM agent for each application. However if you have many applications and only need to instrument a few then you need to disable this. The same applies if you plan to selectively enable metrics from APM agents:
 
-```
+```yaml
 newrelic-eapm-agent:
   # newrelic-eapm-agent.enabled -- Install the [`nr-eapm-agent`](https://github.com/newrelic/helm-charts/tree/master/charts/nr-ebpf-agent)
   enabled: false
 ```
 
-Other things that can save you money are the k8s-agents-operator and newrelic-k8s-metrics-adapter.
+Other things that can save you money are the k8s-agents-operator and newrelic-k8s-metrics-adapter. The New Relic Kubernetes Metrics Adapter is a specialized tool with a singular, powerful function: to enable Horizontal Pod Autoscaling (HPA) in Kubernetes based on performance data stored in New Relic. At its core, the Metrics Adapter implements the Kubernetes external.metrics.k8s.io API. This allows you to define HPA configurations that react to any metric you can query using the New Relic Query Language (NRQL). For instance, you could scale your application's pods based on application-specific metrics like "average transaction response time" or "number of items in a message queue" that are being sent to New Relic.
 
+The New Relic Kubernetes Agents Operator is a much broader and more foundational component. It follows the Kubernetes Operator pattern to simplify the deployment, management, and lifecycle of New Relic's monitoring agents and other New Relic resources within your cluster.
+
+While these are both great tools, if you don't have plans to use either of their functionalities (that is to say your cluster isn't built around the idea of using New Relic as a main component), you don't need them:
+
+```yaml
 k8s-agents-operator:
   # k8s-agents-operator.enabled -- Install the [`k8s-agents-operator` chart](https://github.com/newrelic/k8s-agents-operator/tree/main/charts/k8s-agents-operator)
   enabled: false
@@ -79,6 +84,7 @@ k8s-agents-operator:
 newrelic-k8s-metrics-adapter:
   # newrelic-k8s-metrics-adapter.enabled -- Install the [`newrelic-k8s-metrics-adapter.` chart](https://github.com/newrelic/newrelic-k8s-metrics-adapter/tree/main/charts/newrelic-k8s-metrics-adapter) (Beta)
   enabled: false
+```
 
 ### Using a proxy
 
