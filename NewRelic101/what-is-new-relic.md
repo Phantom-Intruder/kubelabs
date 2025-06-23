@@ -86,10 +86,14 @@ newrelic-k8s-metrics-adapter:
   enabled: false
 ```
 
-### Using a proxy
-
-If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we an achieve this with squid proxy in the next section.
+Once you have finished setting up all the values, you can install (or update your existing installation) with a command like so:
 
 ```bash
 helm repo update ; helm upgrade --install newrelic-bundle newrelic/nri-bundle -n newrelic --values values.yaml
 ```
+
+### Using a proxy
+
+If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we an achieve this with squid proxy in the next section.
+
+[New Relic Proxy](./new-relic-proxy.md)
