@@ -1,37 +1,10 @@
 # New Relic Proxy
 
-Here's a **detailed summary** of the steps you took to **reduce NAT Gateway costs** by routing New Relic APM and infrastructure metrics through a **Squid proxy on an EC2 instance**, instead of directly using NAT Gateway.
+For this lab, we will be setting up a **A Squid proxy server** on an Amazon Linux 2 EC2 instance (public subnet, public IP). * **Private subnet instances** (APM agents, Kubernetes nodes) forward New Relic data via HTTP proxy (to this Squid proxy). We also Configure **Security Groups**, **routing**, and **proxy settings** configured to enable traffic without going through NAT Gateway. The final step is to confirm with New Relic metrics arriving and Squid logging proxy connections.
 
----
+## Steps
 
-## 🎯 **Goal**
-
-You were sending \~5.7 TB/month of APM + integration metrics from private subnets to New Relic over the public internet, incurring \~\$250/month in **NAT Gateway costs**.
-Objective: **Route this data through a single EC2 proxy in a public subnet**, avoiding NAT charges.
-
----
-
-## ✅ **Final Setup Overview**
-
-* **A Squid proxy server** on an Amazon Linux 2 EC2 instance (public subnet, public IP).
-* **Private subnet instances** (APM agents, Kubernetes nodes) forward New Relic data via HTTP proxy.
-* **Security Groups**, **routing**, and **proxy settings** configured to enable traffic without going through NAT Gateway.
-* Successfully confirmed with New Relic metrics arriving and Squid logging proxy connections.
-
----
-
-## 🛠️ Step-by-Step Summary
-
-### 1. **Launch EC2 Instance in Public Subnet**
-
-* AMI: **Amazon Linux 2**
-* Type: **t3.small** (sufficient for \~6 TB monthly egress)
-* Network:
-
-  * Placed in a **public subnet**
-  * Assigned a **public IP**
-* Attached **IAM role with SSM permissions** for easier access
-
+For starters, run a small ec2 instance in a public subnet. Even a small machine would be able to handle quite a lot of data so there is no reason to run anything beyond that considering that the machine will be running forever.
 ---
 
 ### 2. **Install and Configure Squid Proxy**
