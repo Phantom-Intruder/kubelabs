@@ -4,12 +4,7 @@ For this lab, we will be setting up a **A Squid proxy server** on an Amazon Linu
 
 ## Steps
 
-For starters, run a small ec2 instance in a public subnet. Even a small machine would be able to handle quite a lot of data so there is no reason to run anything beyond that considering that the machine will be running forever.
----
-
-### 2. **Install and Configure Squid Proxy**
-
-**Commands:**
+For starters, run a small ec2 instance in a public subnet. Even a small machine would be able to handle quite a lot of data so there is no reason to run anything beyond that considering that the machine will be running forever. In this machine, we will be running the squid proxy:
 
 ```bash
 sudo yum install squid -y
@@ -17,17 +12,18 @@ sudo systemctl enable squid
 sudo systemctl start squid
 ```
 
-**Key squid.conf changes:**
+Now, we need to setup squid by changing the squid.conf. You can find this in `/etc/squid/squid.conf`. The change required is to set the port:
 
-* Set `http_port 3128`
-* Allow traffic from all your 192.168.x.x subnets via:
+* `http_port 3128`
+
+This is the port that New Relic uses to send all its traffic. You also need to ensure that your private subnets accept traffic. For example if your VPC is in 192.168.x.x:
 
   ```bash
   acl localnet src 192.168.0.0/16
   http_access allow localnet
   ```
-* Keep `http_access deny all` at the end
-* Optional: enable access logging (`/var/log/squid/access.log`)
+
+As a final step, keep `http_access deny all` at the end and enable access logging (`/var/log/squid/access.log`). This way, nothing aside from the things you specified can go through your proxy, and you will need logs at first to ensure that NR is actually sending logs through your proxy so you need to have the access log running.
 
 ---
 
