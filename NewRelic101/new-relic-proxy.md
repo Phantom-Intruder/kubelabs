@@ -25,35 +25,21 @@ This is the port that New Relic uses to send all its traffic. You also need to e
 
 As a final step, keep `http_access deny all` at the end and enable access logging (`/var/log/squid/access.log`). This way, nothing aside from the things you specified can go through your proxy, and you will need logs at first to ensure that NR is actually sending logs through your proxy so you need to have the access log running.
 
----
-
-### 3. **Security Group Configuration**
-
-**Squid EC2 SG:**
-
+Next we have the security Group Configuration. For the EC2 running the proxy: 
 * Inbound:
-
   * TCP 3128 from **192.168.0.0/16** (all private subnets)
 * Outbound:
-
   * Allow all (default)
 
-**Client SG (K8s nodes / apps):**
+Unless you have restricted your outbound rules (which you normally don't do), you don't need to change your cluster and nodegroup security groups.
 
-* No change needed if using default outbound rules
-
----
-
-### 4. **Verify Proxy Works**
-
-From a **private subnet instance**:
+Once that is ready, verify that the proxy Works. Log into one of the nodes of your Kubernetes cluster and run:
 
 ```bash
 curl -x http://<squid-private-ip>:3128 https://collector.newrelic.com/status/mongrel
 ```
 
-Should return: `{}`
-If not, check SGs and subnet route tables.
+This calls the New Relic data collection endpoint through the proxy. It should return: `{}` signaling that the request went through. If not, check SGs and subnet route tables.
 
 ---
 
