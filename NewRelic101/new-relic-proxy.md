@@ -41,16 +41,14 @@ curl -x http://<squid-private-ip>:3128 https://collector.newrelic.com/status/mon
 
 This calls the New Relic data collection endpoint through the proxy. It should return: `{}` signaling that the request went through. If not, check SGs and subnet route tables.
 
----
-
-### 5. **Update New Relic Agent Configs to Use Proxy**
-
-In **Java APM Agent YAML**:
+Now that the proxy is up and running, we need to set get your cluster to send all of its data through this proxy. We do this by setting the `proxy_host` and `proxy_port` in your helm values yaml that you got from the previous section:
 
 ```yaml
 proxy_host: <squid-private-ip>
 proxy_port: 3128
 ```
+
+If you have instrumented other applications, APM agents, or so on to New Relic, you can get them to send traffic via proxy using this same host and port. In this case, you can either install or update your cluster with the new Helm values, 
 
 In Kubernetes metrics integrations:
 
