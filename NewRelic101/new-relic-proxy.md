@@ -48,18 +48,11 @@ proxy_host: <squid-private-ip>
 proxy_port: 3128
 ```
 
-If you have instrumented other applications, APM agents, or so on to New Relic, you can get them to send traffic via proxy using this same host and port. In this case, you can either install or update your cluster with the new Helm values, 
+If you have instrumented other applications, APM agents, or so on to New Relic, you can get them to send traffic via proxy using this same host and port. In this case, you can either install or update your cluster with the new Helm values:
 
-In Kubernetes metrics integrations:
-
-* If using New Relic Infrastructure Agent or K8s integration:
-
-  * Set proxy env vars:
-
-    ```yaml
-    HTTP_PROXY=http://<squid-private-ip>:3128
-    HTTPS_PROXY=http://<squid-private-ip>:3128
-    ```
+```bash
+helm repo update ; helm upgrade --install newrelic-bundle newrelic/nri-bundle -n newrelic --values values.yaml
+```
 
 ---
 
