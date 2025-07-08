@@ -54,53 +54,19 @@ If you have instrumented other applications, APM agents, or so on to New Relic, 
 helm repo update ; helm upgrade --install newrelic-bundle newrelic/nri-bundle -n newrelic --values values.yaml
 ```
 
----
+That's all! Now it's a matter of testing and validating that the data is indeed being sent through the Squid proxy. Since we enabled logs in the previous section, you can simply tail the logs:
 
-### 6. **Test and Validate**
+ ```bash
+  sudo tail -f /var/log/squid/access.log
+ ```
+Look for lines like:
 
-* Confirm metrics reach New Relic dashboards.
-* Tail Squid logs:
+ ```
+ TCP_TUNNEL/200 CONNECT collector.newrelic.com:443
+ ```
 
-  ```bash
-  sudo tail -f /var/log/squid/access.log
-  ```
-* Look for lines like:
+If there is data going through this log file there is data going through the proxy.
 
-  ```
-  TCP_TUNNEL/200 CONNECT collector.newrelic.com:443
-  ```
+## Conclusion
 
----
-
-### 7. **Understand Traffic Path**
-
-* App in private subnet → proxy in public subnet via **private IP**
-* Proxy EC2 → internet via **IGW**, **bypassing NAT Gateway**
-* No traffic crosses NAT Gateway anymore
-
----
-
-### 8. **Cost Model Summary**
-
-| Method          | Cost per GB | Monthly Infra | Total Monthly (for 5.7TB) |
-| --------------- | ----------- | ------------- | ------------------------- |
-| NAT Gateway     | \$0.045     | \$32.40       | \~\$295                   |
-| EC2 + Squid/IGW | \$0.09      | \~\$16 EC2    | \~\$532                   |
-
-✅ In your case, **NAT is actually cheaper**.
-But if data volume drops or if you want central proxying for other reasons (control, audit, IP allowlists), EC2 proxy is still valuable.
-
----
-
-## 🔁 Extras You Did
-
-* Used **SSM Session Manager** to connect (ensuring proper IAM role and SSM agent setup)
-* Assigned public IP via EC2 console
-* Verified Squid access with `curl`
-* Identified and fixed SG misconfig (initial 403s and timeouts)
-* Switched from testing with public IP to private IP for proxy access
-* Observed real traffic in Squid logs after config changes
-
----
-
-Let me know if you’d like to automate any part of this setup (e.g., via Terraform or a Launch Template), or monitor the proxy usage over time.
+This ends the section on using a Squid proxy to decrease your NAT gateway costs by routing requests to New Relic through an EC2 instance on a public subnet. This sends data through the internet gateway without using the NAT gateway. Since data through the NAT gateway goes through IGW as well, this cuts the cost by half.
