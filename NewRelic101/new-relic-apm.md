@@ -1,0 +1,3 @@
+# New Relic APM
+
+Setting up the New Relic APM agent is fairly easy. All you need to do is create a newrelic.yml file that contains your NR license key and application name, then reference it in your application startup script. However, it can get fairly complicated if you have a large number of microservices that all need to be configured with APM agents. In this case, we need the newrelic.yml to be shared amongst these microservices with only the differing parts overridden in each application. We will discuss how to do a setup like this in this section.

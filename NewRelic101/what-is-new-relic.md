@@ -70,6 +70,8 @@ newrelic-eapm-agent:
   enabled: false
 ```
 
+You can also read on for the section on properly setting the values to start the APM agent.
+
 Other things that can save you money are the k8s-agents-operator and newrelic-k8s-metrics-adapter. The New Relic Kubernetes Metrics Adapter is a specialized tool with a singular, powerful function: to enable Horizontal Pod Autoscaling (HPA) in Kubernetes based on performance data stored in New Relic. At its core, the Metrics Adapter implements the Kubernetes external.metrics.k8s.io API. This allows you to define HPA configurations that react to any metric you can query using the New Relic Query Language (NRQL). For instance, you could scale your application's pods based on application-specific metrics like "average transaction response time" or "number of items in a message queue" that are being sent to New Relic.
 
 The New Relic Kubernetes Agents Operator is a much broader and more foundational component. It follows the Kubernetes Operator pattern to simplify the deployment, management, and lifecycle of New Relic's monitoring agents and other New Relic resources within your cluster.
@@ -94,6 +96,6 @@ helm repo update ; helm upgrade --install newrelic-bundle newrelic/nri-bundle -n
 
 ### Using a proxy
 
-If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we an achieve this with squid proxy in the next section.
+If you are sending terabytes of data to New Relic (which is generally the case), and your cluster is inside a private VPC, then all that data will be going out of the NAT gateway. You can avoid this by using a proxy in a public subnet that will send the data via the internet gateway instead of the NAT gateway. Since data going through NAT gateway also goes through internet gateway anyways, the cost should go down. We will look at how we can achieve this with squid proxy in the next section.
 
 [New Relic Proxy](./new-relic-proxy.md)
