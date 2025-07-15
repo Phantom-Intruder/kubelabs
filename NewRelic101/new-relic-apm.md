@@ -16,4 +16,13 @@ We can also include the APM agent name here. This is the name that will show on 
 ENV NEW_RELIC_APP_NAME="<you-application-name>"
 ```
 
-This will set the APM agent name to whatever you specfiy, and will override any name that is set in the newrelic.yml.
+This will set the APM agent name to whatever you specify, and will override any name that is set in the newrelic.yml. It will also package your jar and the New Relic jar together. You will not be setting other things like your license key or other common attributes here since all that will be hosted in the shared newrelic.yml file.
+
+There are two ways your application can start. You either have the execution instructions in your dockerfile, or you use `command` at your deployment file level to run your application. We will use the latter example in this case, but it is the same method if you have your execution command baked into your Dockerfile itself. Let's take an example startup command:
+
+```bash
+exec java -javaagent:/newrelicjar/newrelic.jar \
+         -Dnewrelic.config.license_key=${NEWRELIC_KEY} \
+         -Dnewrelic.config.file=/newrelic/newrelic.yml \
+         -jar your-app.jar
+```
