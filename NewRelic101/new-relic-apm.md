@@ -28,3 +28,5 @@ exec java -javaagent:/newrelicjar/newrelic.jar \
 ```
 
 First, the jar is specified. Since we did `RUN curl -o /newrelic/newrelic.jar`, the jar is in the newrelic folder and needs to be referenced as such. We also have the `license_key` added as a secret in Kubernetes, then referenced here. However, you can also choose to have the license key specified in the newrelic.yml that is referenced by all the applications. The `newrelic.yml` itself is also referenced here, but you may have noticed that we never created the newrelic.yml anywhere. So let's do that now.
+
+Since the APM agent yaml is large, we won't have the whole thing here. Instead, view it in the [NewRelic docs](https://docs.newrelic.com/docs/apm/agents/java-agent/configuration/java-agent-config-file-template/). The important fields are `license_key`, `log_level`, `proxy_*` (if you are using one), and anything else that you either want to enable or disable. Things like distributed tracing are very useful, but if you have a different workflow for tracing transactions, you don't need it considering it is rather expensive.
