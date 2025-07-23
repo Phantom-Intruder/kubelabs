@@ -29,4 +29,12 @@ exec java -javaagent:/newrelicjar/newrelic.jar \
 
 First, the jar is specified. Since we did `RUN curl -o /newrelic/newrelic.jar`, the jar is in the newrelic folder and needs to be referenced as such. We also have the `license_key` added as a secret in Kubernetes, then referenced here. However, you can also choose to have the license key specified in the newrelic.yml that is referenced by all the applications. The `newrelic.yml` itself is also referenced here, but you may have noticed that we never created the newrelic.yml anywhere. So let's do that now.
 
-Since the APM agent yaml is large, we won't have the whole thing here. Instead, view it in the [NewRelic docs](https://docs.newrelic.com/docs/apm/agents/java-agent/configuration/java-agent-config-file-template/). The important fields are `license_key`, `log_level`, `proxy_*` (if you are using one), and anything else that you either want to enable or disable. Things like distributed tracing are very useful, but if you have a different workflow for tracing transactions, you don't need it considering it is rather expensive.
+Since the APM agent yaml is large, we won't have the whole thing here. Instead, view it in the [NewRelic docs](https://docs.newrelic.com/docs/apm/agents/java-agent/configuration/java-agent-config-file-template/). The important fields are `license_key`, `log_level`, `proxy_*` (if you are using one), and anything else that you either want to enable or disable. Things like distributed tracing are very useful, but if you have a different workflow for tracing transactions, you don't need it considering it is rather expensive. The documentation should give a good guide on al the things that you can change and what their effect will be. Once you have completed your changes, you should have your own customized newrelic.yml file.
+
+To use this file, we will first copy it into EFS. You can start by mounting the efs to a machine using `mount`:
+
+```bash
+sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 <fs-id>.efs.us-east-1.amazonaws.com:/ /opt/logs/
+```
+
+Now, navigate into your efs, make a folder called `newrelic` and place the yml into it.
