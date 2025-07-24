@@ -37,4 +37,37 @@ To use this file, we will first copy it into EFS. You can start by mounting the 
 sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 <fs-id>.efs.us-east-1.amazonaws.com:/ /opt/logs/
 ```
 
-Now, navigate into your efs, make a folder called `newrelic` and place the yml into it.
+Now, navigate into your efs, make a folder called `newrelic` and place the yml into it. Once that is done we can create a pvc from the EFS and mount the pvc to the container.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-psv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: gp3
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: <file-system>::<access-point>
+```
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: gp3
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: efs-psv
+```
