@@ -71,3 +71,5 @@ spec:
       storage: 10Gi
   volumeName: efs-psv
 ```
+
+Now when you pod deploys, you can `exec` into it and see that the configuration file is present in the pod. You should also be able to go into your New Relic dashboard > APM page and see if your new application is being shown. Any changes you need to do can be directly performed on the new relic yaml in the EFS. Once you restart the module the change will be refleceted. There is no need for a new deployment.
