@@ -72,4 +72,6 @@ spec:
   volumeName: efs-psv
 ```
 
-Now when you pod deploys, you can `exec` into it and see that the configuration file is present in the pod. You should also be able to go into your New Relic dashboard > APM page and see if your new application is being shown. Any changes you need to do can be directly performed on the new relic yaml in the EFS. Once you restart the module the change will be refleceted. There is no need for a new deployment.
+After the pod deploys, you can verify the setup. exec into the pod to confirm the configuration file is present, then check the New Relic APM dashboard to ensure your application is reporting data. To make changes, edit the new-relic.yml file directly on the EFS and restart the module. A new deployment is not required for the changes to take effect.
+
+Next, we'll look at using New Relic correctly for maximum benefit with Kubernetes.
