@@ -1,0 +1,5 @@
+## Using New Relic with Kubernetes
+
+Now that you have your entire cluster instrumented on Kubernetes, let's look at how you can use New Relic to its best. First, head over to the New Relic dashboard, then select your Kubernetes cluster. This will immediately give you an overview of your entire cluster, broken down to a namespace level. You can see all the pods running in each namespace, any issues they have, etc... You can use the filters at the top to drill down to specific pods and if you scroll down the page, you will see all recent events that happened in your cluster. If your cluster is small, this page alone should help you with your entire monitoring stack. However, if your cluster is larger (as it usually is), you will need to get more specialized insights.
+
+To start, go to the Kubernetes Events section. This is argulably the most important page in New Relic with regards to Kubernetes. Since all events are logged here, any issue you face in your cluster will also be logged here. If you pods/nodes/containers go out of memory, disk, or anything else, this page will log it.

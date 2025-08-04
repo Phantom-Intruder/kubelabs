@@ -74,4 +74,6 @@ spec:
 
 After the pod deploys, you can verify the setup. exec into the pod to confirm the configuration file is present, then check the New Relic APM dashboard to ensure your application is reporting data. To make changes, edit the new-relic.yml file directly on the EFS and restart the module. A new deployment is not required for the changes to take effect.
 
-Next, we'll look at using New Relic correctly for maximum benefit with Kubernetes.
+Next, we'll look at using New Relic correctly for maximum benefit with Kubernetes. 
+
+Next section: [Kubernetes with New Relic](./nre-relic-kubernetes.md)
