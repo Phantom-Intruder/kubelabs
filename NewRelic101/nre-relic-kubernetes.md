@@ -22,4 +22,16 @@ Note that you can change the object to be a node name or container name and this
 SELECT event.involvedObject.name, event.message FROM InfrastructureEvent WHERE `event.involvedObject.name` = 'ip-192-168-162-138.ec2.internal' AND (clusterName = 'prod' OR `k8s.cluster.name` = 'prod') SINCE 24 HOURS AGO 
 ```
 
-would work as well.
+would work as well. Another thing you may experience with running Kubernetes pods is that there might be memory issues that arise from time to time. To observe this, you can use the below query:
+
+
+```
+SELECT max(memoryUsedBytes), max(memoryLimitBytes)
+FROM K8sContainerSample 
+WHERE podName = '<pod>' 
+  AND containerName = 'inc-prod-menu-service' 
+  AND clusterName = 'inc-core-prod-primary'
+SINCE 1 day ago TIMESERIES
+```
+
+This will give you a graph that shows the memory used vs the memory limit given to the pod. If the memory used reaches the memory limit, you can expect OOM issues (not always however).
