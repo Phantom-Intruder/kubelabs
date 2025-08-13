@@ -34,4 +34,4 @@ WHERE podName = '<pod>'
 SINCE 1 day ago TIMESERIES
 ```
 
-This will give you a graph that shows the memory used vs the memory limit given to the pod. If the memory used reaches the memory limit, you can expect OOM issues (not always however).
+This will give you a graph that shows the memory used vs the memory limit given to the pod. If the memory used reaches the memory limit, you can expect OOM issues (not always however). You can then use the pods shown by the graph in the event explorer to get specific about what happened. You can also use the APM page to see if there was a memory leak from the application or if garbage collection is not happening prpoerly, etc...
