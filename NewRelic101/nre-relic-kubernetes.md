@@ -29,9 +29,11 @@ would work as well. Another thing you may experience with running Kubernetes pod
 SELECT max(memoryUsedBytes), max(memoryLimitBytes)
 FROM K8sContainerSample 
 WHERE podName = '<pod>' 
-  AND containerName = 'inc-prod-menu-service' 
-  AND clusterName = 'inc-core-prod-primary'
+  AND containerName = '<container>' 
+  AND clusterName = '<cluster>'
 SINCE 1 day ago TIMESERIES
 ```
 
 This will give you a graph that shows the memory used vs the memory limit given to the pod. If the memory used reaches the memory limit, you can expect OOM issues (not always however). You can then use the pods shown by the graph in the event explorer to get specific about what happened. You can also use the APM page to see if there was a memory leak from the application or if garbage collection is not happening prpoerly, etc...
+
+You can also look at Kubernetes Jobs from here. Since jobs start and stop (shutdown), you might have no insights as to what happened to a job pod even if you have the logs. With events, you can get an idea as to the happening of a single job. However, if you wanted to get statistics about your job, you will need NRQL. For example, let's say you wanted to get the longest running job in the month of May.
