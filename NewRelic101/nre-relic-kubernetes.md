@@ -50,4 +50,10 @@ SINCE '2025-05-01' UNTIL '2025-06-01'
 LIMIT 10
 ```
 
-This would give a table with the top 10 longest running jobs in May.
+This would give a table with the top 10 longest running jobs in May. You can then change the month limit to figure out the trend of your longest running jobs so that you can adjust them either from the application side or the infrastructure side. This isn't remotely close to what NRQL can offer you. To get a full list of metrics available to you, use:
+
+```
+SELECT keyset() FROM K8sJobSample SINCE 1 day AGO
+```
+
+This will output a JSON list of all the metrics and options that Cron jobs push to New Relic. This same approach can be used for other items such as `K8sContainerSample`, `K8sPodSample`, `K8sNodeSample`, etc...
