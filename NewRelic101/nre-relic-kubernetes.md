@@ -57,3 +57,5 @@ SELECT keyset() FROM K8sJobSample SINCE 1 day AGO
 ```
 
 This will output a JSON list of all the metrics and options that Cron jobs push to New Relic. This same approach can be used for other items such as `K8sContainerSample`, `K8sPodSample`, `K8sNodeSample`, etc...
+
+Addtionally, you can use the New Relic AI to ask questions in plain english and have them transalted to NRQL queries, which will be automatically run to give you a direct answer. Note that if you were to use other generative AI such as chatgpt, you would get mostly correct NRQL queries, but the keysets that they use might be incorrect on occasion. For example, it might give you a query which uses `endTime` instead of `completedAt`, and New Relic doesn't do a great job of letting you know when you are trying to use keys that don't exist. Instead it gives you a blank response and you are left wondering if you don't have data. So if you notice some issue like that, you can use the `SELECT keyset()` to get the keysets first, then feed the result into gen AI so their answers can be more accurate.
