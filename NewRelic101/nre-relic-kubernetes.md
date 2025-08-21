@@ -59,3 +59,133 @@ SELECT keyset() FROM K8sJobSample SINCE 1 day AGO
 This will output a JSON list of all the metrics and options that Cron jobs push to New Relic. This same approach can be used for other items such as `K8sContainerSample`, `K8sPodSample`, `K8sNodeSample`, etc...
 
 Addtionally, you can use the New Relic AI to ask questions in plain english and have them transalted to NRQL queries, which will be automatically run to give you a direct answer. Note that if you were to use other generative AI such as chatgpt, you would get mostly correct NRQL queries, but the keysets that they use might be incorrect on occasion. For example, it might give you a query which uses `endTime` instead of `completedAt`, and New Relic doesn't do a great job of letting you know when you are trying to use keys that don't exist. Instead it gives you a blank response and you are left wondering if you don't have data. So if you notice some issue like that, you can use the `SELECT keyset()` to get the keysets first, then feed the result into gen AI so their answers can be more accurate.
+
+## Dashboards
+
+Of course. Here are the step-by-step instructions for creating a New Relic dashboard for Kubernetes monitoring.
+
+The process involves two main phases: ensuring the Kubernetes integration is installed and then building the dashboard itself within the New Relic UI.
+
+-----
+
+## Phase 1: Prerequisites - Install the Kubernetes Integration
+
+Before you can build a dashboard, you **must** be sending Kubernetes data to your New Relic account. If you haven't done this yet, you won't have any metrics to display.
+
+1.  **Log in** to your New Relic account.
+2.  Navigate to **Add data** \> **Kubernetes**.
+3.  Follow the guided installation process. It will provide you with a Helm command tailored to your account license key and cluster name.
+4.  Run the provided Helm command in your terminal that has `kubectl` access to your Kubernetes cluster.
+5.  Wait a few minutes for the data to start reporting. You can verify this by going to the **Kubernetes Cluster Explorer** in New Relic and seeing if your cluster appears.
+
+-----
+
+## Phase 2: Create and Configure the Dashboard
+
+Once data is flowing, you can build your custom dashboard.
+
+### Step 1: Create a New Dashboard
+
+1.  In the New Relic UI, navigate to the **Dashboards** section from the main menu on the left.
+2.  Click the **Create a dashboard** button in the top right corner.
+3.  Give your dashboard a descriptive name, like "Production Cluster Health" or "E-commerce App Monitoring".
+4.  Confirm the account you want the dashboard associated with and set permissions if needed. Click **Create**.
+
+You will now have a blank canvas to add your charts (called "widgets" in New Relic).
+
+### Step 2: Add Your First Widget (Chart)
+
+You can add widgets using either the user-friendly Chart Builder or by writing a custom NRQL query. NRQL is more powerful and flexible but we will breifly look at using the chart builder.
+
+#### Using the Chart Builder
+
+This method is great for exploring data without knowing NRQL.
+
+1.  On your new dashboard, click the **+ Add widget** button.
+2.  Select **Build a chart**.
+3.  Under "Data type", choose **Metrics**.
+4.  In the "Find a metric..." search box, type in a Kubernetes metric. For example, search for `k8s.pod.cpuCoresUtilization`.
+5.  New Relic will automatically generate a basic chart. You can now refine it using the UI:
+      * **`View by`**: Choose an aggregator function like `average`, `max`, or `sum`.
+      * **`Group by`**: This is very useful. You could group the CPU utilization by `podName` or `namespaceName` to see which pods or namespaces are using the most CPU.
+      * **`Filter by`**: Narrow down the data. For example, filter to a specific `clusterName` or `deploymentName`.
+6.  Once you are happy with the chart, click **Save** in the bottom right.
+
+Next, let's take a look at using NRQL.
+
+#### Using NRQL
+
+This is the recommended method for creating precise, customized charts.
+
+1.  On your dashboard, click **+ Add widget**.
+2.  Select **Add a chart from a query**.
+3.  In the query editor, type your NRQL query. The basic structure is `SELECT function(attribute) FROM DataType WHERE condition SINCE time`.
+4.  Choose a visualization type (e.g., time series, pie chart, table, billboard).
+5.  Click **Run** to preview your chart.
+6.  Give the chart a title and click **Save**.
+
+### Step 3: Add Essential Kubernetes Charts with NRQL
+
+Here are some common and highly useful NRQL queries you can use to build a comprehensive Kubernetes dashboard. Just copy and paste them into the NRQL query editor.
+
+-----
+
+#### **Cluster-Wide CPU & Memory Usage**
+
+These "billboard" charts give you a quick, at-a-glance view of your cluster's overall resource consumption.
+
+  * **Total CPU Usage (%)**
+    ```nrql
+    SELECT average(k8s.cluster.cpuCoresUtilization) AS 'Cluster CPU %' FROM K8sClusterSample
+    ```
+  * **Total Memory Usage (%)**
+    ```nrql
+    SELECT average(k8s.cluster.memoryUtilization) AS 'Cluster Memory %' FROM K8sClusterSample
+    ```
+
+-----
+
+#### **Node Status**
+
+This chart helps you see the health and readiness of all the nodes (the servers running your pods) in the cluster.
+
+  * **Node Count by Condition** (visualize as a Pie Chart)
+    ```nrql
+    SELECT count(entityName) FROM K8sNodeSample FACET condition
+    ```
+
+-----
+
+#### **Pod Monitoring**
+
+These charts are critical for understanding the health of your applications.
+
+  * **Top 10 Pods by CPU Usage** (visualize as a Table or Bar Chart)
+    ```nrql
+    SELECT average(cpuCoresUtilization) FROM K8sContainerSample FACET podName SINCE 30 minutes ago LIMIT 10
+    ```
+  * **Top 10 Pods by Memory Usage** (visualize as a Table or Bar Chart)
+    ```nrql
+    SELECT average(memoryWorkingSetBytes) / 1024 / 1024 AS 'Memory (MB)' FROM K8sContainerSample FACET podName SINCE 30 minutes ago LIMIT 10
+    ```
+  * **Pod Restarts by Namespace** (visualize as a Time Series Line Chart)
+    ```nrql
+    SELECT sum(restartCount) FROM K8sPodSample TIMESERIES FACET namespaceName
+    ```
+
+-----
+
+#### **Deployment & Workload Status**
+
+This helps you ensure your deployments are running as expected.
+
+  * **Deployments Not at Desired Pod Count** (visualize as a Table)
+    ```nrql
+    SELECT deploymentName, podsAvailable, podsDesired FROM K8sDeploymentSample WHERE podsAvailable != podsDesired
+    ```
+
+### Step 4: Organize and Enhance Your Dashboard
+
+  * **Resize and Move:** Drag and drop widgets to arrange them logically. A good practice is to put high-level cluster metrics at the top and more granular pod/container metrics below.
+  * **Add Template Variables:** Make your dashboard interactive by adding filters. Click the **...** menu on your dashboard, select **Edit dashboard**, and go to the **Variables** tab. You can create a variable for `clusterName` or `namespaceName` that allows you to filter the entire dashboard with a dropdown menu.
+  * **Add Markdown Notes:** Use the **Add widget \> Add text, images, or links** option to add Markdown widgets. These are perfect for adding titles, explanations, or links to runbooks.
