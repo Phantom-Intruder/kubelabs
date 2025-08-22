@@ -62,28 +62,6 @@ Addtionally, you can use the New Relic AI to ask questions in plain english and 
 
 ## Dashboards
 
-Of course. Here are the step-by-step instructions for creating a New Relic dashboard for Kubernetes monitoring.
-
-The process involves two main phases: ensuring the Kubernetes integration is installed and then building the dashboard itself within the New Relic UI.
-
------
-
-## Phase 1: Prerequisites - Install the Kubernetes Integration
-
-Before you can build a dashboard, you **must** be sending Kubernetes data to your New Relic account. If you haven't done this yet, you won't have any metrics to display.
-
-1.  **Log in** to your New Relic account.
-2.  Navigate to **Add data** \> **Kubernetes**.
-3.  Follow the guided installation process. It will provide you with a Helm command tailored to your account license key and cluster name.
-4.  Run the provided Helm command in your terminal that has `kubectl` access to your Kubernetes cluster.
-5.  Wait a few minutes for the data to start reporting. You can verify this by going to the **Kubernetes Cluster Explorer** in New Relic and seeing if your cluster appears.
-
------
-
-## Phase 2: Create and Configure the Dashboard
-
-Once data is flowing, you can build your custom dashboard.
-
 ### Step 1: Create a New Dashboard
 
 1.  In the New Relic UI, navigate to the **Dashboards** section from the main menu on the left.
@@ -95,7 +73,7 @@ You will now have a blank canvas to add your charts (called "widgets" in New Rel
 
 ### Step 2: Add Your First Widget (Chart)
 
-You can add widgets using either the user-friendly Chart Builder or by writing a custom NRQL query. NRQL is more powerful and flexible but we will breifly look at using the chart builder.
+You can add widgets using either the user-friendly Chart Builder or by writing a custom NRQL query. NRQL is more powerful and flexible but we will briefly look at using the chart builder.
 
 #### Using the Chart Builder
 
@@ -173,6 +151,23 @@ These charts are critical for understanding the health of your applications.
     SELECT sum(restartCount) FROM K8sPodSample TIMESERIES FACET namespaceName
     ```
 
+This is also a great place to use the previoud NRQL query:
+
+```
+SELECT max(memoryUsedBytes), max(memoryLimitBytes)
+FROM K8sContainerSample 
+WHERE podName = '<pod>' 
+  AND containerName = '<container>' 
+  AND clusterName = '<cluster>'
+SINCE 1 day ago TIMESERIES
+```
+
+Without just showing the memory usage, it will also show the usage vs limit. This is also a great place to check the replica count over time:
+
+```
+SELECT max(podsAvailable) FROM K8sDeploymentSample WHERE deploymentName IN (FROM Transaction SELECT latest(deploymentName) WHERE appName IN ('<apm-agent>') SINCE 1 hour ago) AND clusterName = '<cluster>' TIMESERIES since 1 hour ago
+```
+
 -----
 
 #### **Deployment & Workload Status**
@@ -183,9 +178,3 @@ This helps you ensure your deployments are running as expected.
     ```nrql
     SELECT deploymentName, podsAvailable, podsDesired FROM K8sDeploymentSample WHERE podsAvailable != podsDesired
     ```
-
-### Step 4: Organize and Enhance Your Dashboard
-
-  * **Resize and Move:** Drag and drop widgets to arrange them logically. A good practice is to put high-level cluster metrics at the top and more granular pod/container metrics below.
-  * **Add Template Variables:** Make your dashboard interactive by adding filters. Click the **...** menu on your dashboard, select **Edit dashboard**, and go to the **Variables** tab. You can create a variable for `clusterName` or `namespaceName` that allows you to filter the entire dashboard with a dropdown menu.
-  * **Add Markdown Notes:** Use the **Add widget \> Add text, images, or links** option to add Markdown widgets. These are perfect for adding titles, explanations, or links to runbooks.
