@@ -151,7 +151,7 @@ These charts are critical for understanding the health of your applications.
     SELECT sum(restartCount) FROM K8sPodSample TIMESERIES FACET namespaceName
     ```
 
-This is also a great place to use the previoud NRQL query:
+This is also a great place to use the previous NRQL query:
 
 ```
 SELECT max(memoryUsedBytes), max(memoryLimitBytes)
@@ -178,3 +178,10 @@ This helps you ensure your deployments are running as expected.
     ```nrql
     SELECT deploymentName, podsAvailable, podsDesired FROM K8sDeploymentSample WHERE podsAvailable != podsDesired
     ```
+
+
+Using these queries you should be able to get a pretty good idea of what goes on inside your Kubernetes cluster.
+
+## Conclusion
+
+This brings us to the end of the section on Kubernetes with New Relic. A few resources that will help you greatly with the New Relic integration are:
