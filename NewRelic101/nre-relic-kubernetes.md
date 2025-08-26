@@ -186,6 +186,138 @@ Using these queries you should be able to get a pretty good idea of what goes on
 
 Now that we have montioring figured out, let's take a look at alerting. Any time a certain metrics breaches a certain threshold, you can get alerted of it. That being said. there are a number of places in a Kubernetes cluster where we shouldn't alert to prevent unnecessary noise from distracting you from the actual alerts. The best part of alerting with New Relic is that they provide an in-built set of alerts that you can use as a starting point for you alerting.
 
+## Step 2: Create an Alert Policy and Conditions
+With data flowing, you can now define what to alert on. Let's create a policy and add a few common, practical alert conditions.
+
+In the New Relic UI, navigate to Alerts & AI -> Policies.
+
+Click New alert policy.
+
+Give the policy a name, like k8s-production-alerts.
+
+Set the Incident preference. "By condition and entity" is a good default, as it creates a separate incident for each pod/node that violates the condition.
+
+Click Create policy.
+
+Now, inside the policy, click Add a condition. We'll use the NRQL query option for maximum flexibility.
+
+Example 1: High Pod CPU Utilization
+This condition will trigger if any pod's CPU usage is consistently high.
+
+NRQL Query:
+
+SQL
+
+SELECT average(cpuUsedCores) FROM K8sContainerSample FACET podName
+This query calculates the average CPU cores used, broken down by each pod.
+
+Threshold: Set the condition to trigger when the query returns a value above 0.8 (for 80% of a core) for at least 5 minutes.
+
+Condition Name: "High Pod CPU".
+
+Example 2: Pod is Frequently Restarting (CrashLoopBackOff)
+This is a critical alert for application health.
+
+NRQL Query:
+
+SQL
+
+SELECT count(restartCount) FROM K8sPodSample WHERE reason = 'CrashLoopBackOff' FACET podName
+This query counts the number of times pods have a restart reason of CrashLoopBackOff.
+
+Threshold: Set the condition to trigger when the sum of query results is above 3 in 15 minutes. This means if a pod gets stuck in a crash loop and restarts more than 3 times in 15 minutes, you'll be notified.
+
+Condition Name: "Pod CrashLooping".
+
+Example 3: Node Not Ready
+This alerts you if a worker node in your cluster becomes unhealthy.
+
+NRQL Query:
+
+SQL
+
+SELECT uniqueCount(nodeName) FROM K8sNodeSample WHERE conditionStatus != 'True' AND condition = 'Ready'
+This query counts the number of nodes whose "Ready" status is not "True".
+
+Threshold: Trigger when the query returns a value above 0 for at least 5 minutes.
+
+Condition Name: "Node Not Ready".
+
+## Step 3: Configure Notifications with Workflows
+Now that you have conditions that can trigger incidents, you need to be notified.
+
+In the New Relic UI, navigate to Alerts & AI -> Workflows.
+
+Click New workflow.
+
+Give the workflow a name, like Notify k8s production admins.
+
+Filter for Your Policy
+The first step is to tell the workflow which incidents to act on.
+
+Click Filter and build a filter using the attribute policyName.
+
+Set it to policyName 'is equal to' k8s-production-alerts.
+
+Set Up a Destination
+Next, tell the workflow where to send the notification. First, you might need to create the destination itself.
+
+Go to Alerts & AI -> Destinations. Choose a destination type like Slack or PagerDuty and follow the on-screen instructions for authentication.
+
+Back in your workflow, click Notify. Select the destination you just created (e.g., "Engineering On-Call Slack").
+
+Customize the Notification
+This is where workflows shine. You can customize the message to be more informative using built-in variables called "template helpers."
+
+For a Slack destination, you could customize the message to include key details:
+
+JSON
+
+{
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "🚨 *New Relic Alert: {{ issueTitle }}*"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Policy:*\n{{ accumulations.policyName }}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Condition:*\n{{ accumulations.conditionName }}"
+        },
+         {
+          "type": "mrkdwn",
+          "text": "*Violating Entity:*\n{{ accumulations.entities.name }}"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "View Incident Details"
+          },
+          "url": "{{ issuePageUrl }}"
+        }
+      ]
+    }
+  ]
+}
+Activate your workflow.
+
+Now, when a condition in your k8s-production-alerts policy is violated, it will trigger an incident, which will be caught by the workflow's filter and sent as a detailed, custom-formatted message to your chosen destination.
+
 ## Conclusion
 
 This brings us to the end of the section on Kubernetes with New Relic. A few resources that will help you greatly with the New Relic integration are:
