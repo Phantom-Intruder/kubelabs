@@ -182,6 +182,10 @@ This helps you ensure your deployments are running as expected.
 
 Using these queries you should be able to get a pretty good idea of what goes on inside your Kubernetes cluster.
 
+## Alerting
+
+Now that we have montioring figured out, let's take a look at alerting. Any time a certain metrics breaches a certain threshold, you can get alerted of it. That being said. there are a number of places in a Kubernetes cluster where we shouldn't alert to prevent unnecessary noise from distracting you from the actual alerts. The best part of alerting with New Relic is that they provide an in-built set of alerts that you can use as a starting point for you alerting.
+
 ## Conclusion
 
 This brings us to the end of the section on Kubernetes with New Relic. A few resources that will help you greatly with the New Relic integration are:
