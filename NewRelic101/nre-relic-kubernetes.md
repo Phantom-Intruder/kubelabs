@@ -186,7 +186,6 @@ Using these queries you should be able to get a pretty good idea of what goes on
 
 Now that we have montioring figured out, let's take a look at alerting. Any time a certain metrics breaches a certain threshold, you can get alerted of it. That being said. there are a number of places in a Kubernetes cluster where we shouldn't alert to prevent unnecessary noise from distracting you from the actual alerts. The best part of alerting with New Relic is that they provide an in-built set of alerts that you can use as a starting point for you alerting.
 
-## Step 2: Create an Alert Policy and Conditions
 With data flowing, you can now define what to alert on. Let's create a policy and add a few common, practical alert conditions.
 
 In the New Relic UI, navigate to Alerts & AI -> Policies.
@@ -201,7 +200,8 @@ Click Create policy.
 
 Now, inside the policy, click Add a condition. We'll use the NRQL query option for maximum flexibility.
 
-Example 1: High Pod CPU Utilization
+### Setting up alerts
+**Example 1**: High Pod CPU Utilization
 This condition will trigger if any pod's CPU usage is consistently high.
 
 NRQL Query:
@@ -215,7 +215,7 @@ Threshold: Set the condition to trigger when the query returns a value above 0.8
 
 Condition Name: "High Pod CPU".
 
-Example 2: Pod is Frequently Restarting (CrashLoopBackOff)
+**Example 2**: Pod is Frequently Restarting (CrashLoopBackOff)
 This is a critical alert for application health.
 
 NRQL Query:
@@ -229,7 +229,7 @@ Threshold: Set the condition to trigger when the sum of query results is above 3
 
 Condition Name: "Pod CrashLooping".
 
-Example 3: Node Not Ready
+**Example 3**: Node Not Ready
 This alerts you if a worker node in your cluster becomes unhealthy.
 
 NRQL Query:
@@ -243,7 +243,7 @@ Threshold: Trigger when the query returns a value above 0 for at least 5 minutes
 
 Condition Name: "Node Not Ready".
 
-## Step 3: Configure Notifications with Workflows
+### Configure Notifications with Workflows
 Now that you have conditions that can trigger incidents, you need to be notified.
 
 In the New Relic UI, navigate to Alerts & AI -> Workflows.
@@ -318,6 +318,6 @@ Activate your workflow.
 
 Now, when a condition in your k8s-production-alerts policy is violated, it will trigger an incident, which will be caught by the workflow's filter and sent as a detailed, custom-formatted message to your chosen destination.
 
-## Conclusion
+### When to not alert
 
-This brings us to the end of the section on Kubernetes with New Relic. A few resources that will help you greatly with the New Relic integration are:
+One important rule of alerting is that you should only alert the things that are absolutely necessary. If you keep firing off alerts all the time, the team member who recieves the alerts will start being ignored or de-prioritized. This is specially true of there is nothing that the person can do nothing about the alert. For example, if the CPU usage is high and there is a scaler in place to scale up based on CPU usage, unless the CPU scaler is not working and the pods are getting throttled, alerting should not be happening. If the alert goes off and all the user has to do is to sit and watch the new pods scale up, then there is no point in the user being there at all. If the new pod doesn't scale up or if it starts crashing, or is unable to get in to a ready state, that is the point the user should get involved.
